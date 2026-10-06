@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Registro de móviles · El Pino Ltda.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pino:#1E3A2C; --pino-2:#2D5240; --papel:#EDF0EB; --blanco:#FFFFFF;
+  --tinta:#18201B; --gris:#5F6A63; --linea:#CBD3CD; --senal:#F2C230; --rojo:#A93226; --ok:#2F7A4B;
+  --cond:"Barlow Condensed","Arial Narrow","Roboto Condensed",sans-serif;
+  --txt:"Barlow","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:var(--txt);font-size:15px;line-height:1.45;color:var(--tinta);background:var(--papel);display:flex;flex-direction:column}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--senal);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Barra superior */
+header.top{background:var(--pino);color:var(--blanco);display:flex;align-items:center;gap:16px;padding:10px 20px;flex-wrap:wrap}
+.marca{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.marca h1{font-family:var(--cond);font-weight:700;font-size:26px;letter-spacing:.01em;margin:0;line-height:1}
+.marca .lema{font-size:13px;opacity:.75}
+.acciones{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid transparent;border-radius:6px;padding:8px 14px;cursor:pointer;background:var(--blanco);color:var(--tinta);font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-senal{background:var(--senal);color:var(--tinta)}
+.btn-borde{background:transparent;border-color:rgba(255,255,255,.45);color:var(--blanco)}
+.btn-borde:hover{border-color:var(--blanco)}
+.btn-claro{background:var(--blanco);border-color:var(--linea)}
+.btn-claro:hover{border-color:var(--gris)}
+.btn-pino{background:var(--pino);color:var(--blanco)}
+.btn-pino:hover:not(:disabled){background:var(--pino-2)}
+.btn-peligro{background:transparent;border-color:var(--rojo);color:var(--rojo)}
+.btn-peligro:hover{background:var(--rojo);color:var(--blanco)}
+.btn-peligro-lleno{background:var(--rojo);color:var(--blanco)}
+
+/* Estructura */
+main{flex:1;display:grid;grid-template-columns:minmax(320px,440px) 1fr;min-height:0}
+.lista{border-right:1px solid var(--linea);display:flex;flex-direction:column;min-height:0;background:var(--papel)}
+.filtros{padding:16px 16px 10px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--linea)}
+.buscar{width:100%;padding:10px 12px;border:1px solid var(--linea);border-radius:6px;background:var(--blanco)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--linea);background:var(--blanco);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--pino);border-color:var(--pino);color:var(--blanco)}
+.resumen{font-size:13px;color:var(--gris)}
+.tablero{overflow:auto;padding:14px 16px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px;align-content:start}
+
+/* Placa de móvil: el elemento distintivo */
+.placa{all:unset;cursor:pointer;display:flex;flex-direction:column;border-radius:6px;background:var(--blanco);border:1px solid var(--linea);overflow:hidden;min-height:98px}
+.placa .num{font-family:var(--cond);font-weight:700;font-size:34px;line-height:1;padding:8px 10px 6px;background:var(--senal);border-bottom:2px solid var(--tinta);font-variant-numeric:tabular-nums}
+.placa .nom{padding:6px 10px 2px;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.placa .docs{padding:0 10px 8px;font-size:12px;color:var(--gris);display:flex;align-items:center;gap:6px}
+.barra{flex:1;height:4px;background:var(--linea);border-radius:2px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--ok)}
+.placa.libre{background:transparent;border-style:dashed}
+.placa.libre .num{background:transparent;color:var(--gris);border-bottom:1px dashed var(--linea)}
+.placa.libre .nom{color:var(--gris);font-weight:400}
+.placa:hover{border-color:var(--gris)}
+.placa[aria-current="true"]{outline:3px solid var(--pino);outline-offset:1px}
+.placa:focus-visible{outline:3px solid var(--senal)}
+
+/* Ficha */
+.ficha{overflow:auto;min-height:0;background:var(--blanco)}
+.vacio{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;color:var(--gris);gap:14px}
+.vacio h2{font-family:var(--cond);font-size:30px;color:var(--tinta);margin:0}
+.vacio p{max-width:46ch;margin:0}
+.vacio .acciones .btn-claro{border-color:var(--linea)}
+.ficha-cab{position:sticky;top:0;z-index:2;background:var(--blanco);border-bottom:1px solid var(--linea);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.volver{display:none}
+.placa-grande{font-family:var(--cond);font-weight:700;font-size:44px;line-height:1;background:var(--senal);border:2px solid var(--tinta);border-radius:6px;padding:4px 14px;font-variant-numeric:tabular-nums}
+.ficha-cab h2{font-family:var(--cond);font-weight:600;font-size:28px;margin:0;line-height:1.1}
+.ficha-cab .sub{font-size:13px;color:var(--gris)}
+.ficha-cab .der{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.cuerpo{padding:22px 24px 48px;max-width:1080px}
+section.bloque{margin-bottom:30px}
+section.bloque h3{font-family:var(--cond);font-weight:600;font-size:21px;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid var(--pino)}
+.campos{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px 18px}
+.campo{display:flex;flex-direction:column;gap:4px}
+.campo label{font-size:13px;font-weight:600;color:var(--gris)}
+.campo input,.campo select{padding:9px 11px;border:1px solid var(--linea);border-radius:6px;background:var(--blanco);width:100%}
+.campo input:focus,.campo select:focus{border-color:var(--pino);outline:none;box-shadow:0 0 0 3px rgba(30,58,44,.18)}
+.campo .ayuda{font-size:12px;color:var(--gris);min-height:1em}
+.campo .ayuda.mal{color:var(--rojo)}
+.campo.ancho{grid-column:1/-1}
+
+.docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.doc{border:1px solid var(--linea);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;background:var(--papel)}
+.doc .titulo{font-size:13px;font-weight:600;padding:8px 10px;background:var(--blanco);border-bottom:1px solid var(--linea)}
+.doc .marco{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;background:var(--papel)}
+.doc .marco img{width:100%;height:100%;object-fit:cover;display:block}
+.doc .marco.sin{border:0;color:var(--gris);font-size:13px;text-align:center;padding:10px;flex-direction:column;gap:6px}
+.doc .marco.sin b{font-size:26px;font-weight:500;line-height:1}
+.doc .marco.arrastre{background:#FFF6D6;outline:2px dashed var(--senal);outline-offset:-6px}
+.doc .ops{display:flex;gap:4px;padding:6px;background:var(--blanco);border-top:1px solid var(--linea);flex-wrap:wrap}
+.doc .ops button{flex:1;border:1px solid var(--linea);background:var(--blanco);border-radius:4px;padding:5px 4px;font-size:12px;cursor:pointer;min-width:0}
+.doc .ops button:hover{border-color:var(--gris)}
+.doc .ops button.quitar{color:var(--rojo)}
+.cambios{font-size:13px;color:var(--rojo);font-weight:600}
+
+/* Diálogos */
+dialog{border:0;border-radius:8px;padding:0;max-width:min(520px,92vw);width:100%;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(20,30,24,.55)}
+.dlg{padding:22px 24px}
+.dlg h2{font-family:var(--cond);font-size:26px;margin:0 0 8px}
+.dlg p{margin:0 0 14px;color:var(--gris)}
+.dlg .pie{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;flex-wrap:wrap}
+#visor{max-width:96vw;width:auto;background:#101410}
+.fuentes{display:flex;flex-direction:column;gap:8px}
+.fuente{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--linea);border-radius:8px;cursor:pointer;background:var(--blanco)}
+.fuente:hover,.fuente:focus-visible{border-color:var(--pino);background:var(--papel)}
+.fuente .ico{font-size:24px;width:32px;text-align:center}
+.fuente b{display:block;font-size:15px}
+.fuente small{color:var(--gris);font-size:13px}
+#dlgCamara{max-width:min(720px,96vw);background:#101410;color:#fff}
+#dlgCamara .vista{position:relative;background:#000;display:flex;align-items:center;justify-content:center;min-height:240px}
+#dlgCamara video{display:block;width:100%;max-height:70vh;object-fit:contain}
+#dlgCamara .cam-pie{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:12px 14px;flex-wrap:wrap}
+#dlgCamara .cam-pie .titulo{font-size:13px;opacity:.85;margin-right:auto}
+.disparo{width:64px;height:64px;border-radius:50%;border:4px solid #fff;background:var(--senal);cursor:pointer;flex:none}
+.disparo:disabled{opacity:.4}
+.doc .ops.dos{display:grid;grid-template-columns:1fr 1fr}
+#visor img{display:block;max-width:94vw;max-height:84vh;object-fit:contain}
+#visor .vpie{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;color:#fff;font-size:13px}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--tinta);color:var(--blanco);padding:10px 18px;border-radius:6px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:50;max-width:90vw}
+.toast.ver{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:var(--rojo)}
+footer.pie-app{font-size:12px;color:var(--gris);padding:6px 20px;border-top:1px solid var(--linea);display:flex;gap:16px;flex-wrap:wrap;background:var(--papel)}
+.menu{position:relative}
+.menu-lista{position:absolute;right:0;top:calc(100% + 6px);background:var(--blanco);color:var(--tinta);border:1px solid var(--linea);border-radius:6px;min-width:250px;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:4px}
+.menu-lista button{all:unset;display:block;width:100%;box-sizing:border-box;padding:9px 12px;cursor:pointer;border-radius:4px;font-size:14px}
+.menu-lista button small{display:block;color:var(--gris);font-size:12px}
+.menu-lista button:hover,.menu-lista button:focus-visible{background:var(--papel)}
+
+/* ---------- Tablet horizontal / notebook chico ---------- */
+@media (max-width:1180px){
+  main{grid-template-columns:minmax(280px,360px) 1fr}
+  .tablero{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;padding:12px}
+  .placa .num{font-size:30px}
+  .cuerpo{padding:20px 20px 40px}
+  .campos{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  .docs-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+  header.top .lema{display:none}
+}
+
+/* ---------- Tablet vertical y celular: listado a pantalla completa, ficha encima ---------- */
+@media (max-width:860px){
+  html,body{height:100%;height:100dvh}
+  main{grid-template-columns:minmax(0,1fr)}
+  .lista{border-right:0;min-width:0}
+  header.top{padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));gap:10px}
+  .marca h1{font-size:23px}
+  .btn{min-height:44px}
+  .filtros{padding:12px 14px 8px;position:sticky;top:0;background:var(--papel);z-index:3}
+  .buscar{font-size:16px;min-height:44px}
+  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px 2px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;min-height:36px}
+  .tablero{padding:12px 14px calc(24px + env(safe-area-inset-bottom))}
+
+  /* Ficha como pantalla completa */
+  .ficha{position:fixed;inset:0;z-index:30;display:none;overscroll-behavior:contain}
+  body.con-ficha .ficha{display:block}
+  body.con-ficha{overflow:hidden}
+  .volver{display:inline-flex;white-space:nowrap;flex:none;padding:8px 12px}
+  .marca h1{white-space:nowrap}
+  .btn{white-space:nowrap}
+  .ficha-cab{padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));gap:12px;flex-wrap:nowrap}
+  .ficha-cab > div{min-width:0}
+  .ficha-cab h2{font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .placa-grande{font-size:30px;padding:2px 10px;flex:none}
+  /* Botones Guardar/Descartar fijos abajo, al alcance del pulgar */
+  .ficha-cab .der{position:fixed;left:0;right:0;bottom:0;margin:0;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:var(--blanco);border-top:1px solid var(--linea);box-shadow:0 -4px 16px rgba(24,32,27,.08);z-index:5;flex-wrap:nowrap}
+  .ficha-cab .der .btn{flex:1;justify-content:center}
+  .cuerpo{padding:18px 14px calc(96px + env(safe-area-inset-bottom))}
+  .campo input,.campo select{font-size:16px;min-height:44px}
+  .docs-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .doc .ops{display:grid;grid-template-columns:1fr 1fr}
+  .doc .ops button{font-size:12px;min-height:36px}
+  .arrastra{display:none}
+
+  /* Diálogos tipo hoja inferior */
+  dialog:not(#visor):not(#dlgCamara){margin:auto 0 0;max-width:100%;border-radius:14px 14px 0 0}
+  dialog:not(#visor):not(#dlgCamara) .dlg{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
+  .dlg .pie .btn{flex:1;justify-content:center}
+  .menu-lista{position:fixed;left:12px;right:12px;top:auto;bottom:calc(12px + env(safe-area-inset-bottom));min-width:0}
+  .menu-lista button{padding:14px 12px}
+  #visor{max-width:100vw;max-height:100dvh;width:100vw;margin:0;border-radius:0}
+  #dlgCamara{max-width:100vw;width:100vw;height:100dvh;max-height:100dvh;margin:0;border-radius:0}
+  #dlgCamara[open]{display:flex;flex-direction:column}
+  #dlgCamara .vista{flex:1}
+  #dlgCamara video{max-height:none;height:100%}
+  #dlgCamara .cam-pie{padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+  #visor img{max-width:100vw;max-height:calc(100dvh - 70px)}
+  #visor .vpie{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+  footer.pie-app{padding:6px 14px calc(6px + env(safe-area-inset-bottom));font-size:11px}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
+}
+
+/* ---------- Celular ---------- */
+@media (max-width:560px){
+  .largo{display:none}
+  header.top{flex-wrap:nowrap}
+  .acciones{gap:6px}
+  header.top .btn{padding:8px 11px}
+  .tablero{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+  .placa{min-height:86px}
+  .placa .num{font-size:26px;padding:6px 8px 4px}
+  .placa .nom{padding:5px 8px 2px;font-size:12px}
+  .placa .docs{padding:0 8px 7px;font-size:11px}
+  .campos{grid-template-columns:1fr;gap:12px}
+  .docs-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  section.bloque h3{font-size:19px}
+  #pieAlmacen{display:none}
+  .marca h1{font-size:20px}
+  header.top .btn{padding:8px 10px;font-size:13px}
+  .ficha-cab .sub{font-size:12px}
+}
+@media (max-width:400px){
+  .ltda{display:none}
+}
+@media (max-width:380px){
+  header.top{padding-left:10px;padding-right:10px;gap:6px}
+  .acciones{gap:4px}
+  header.top .btn{padding:8px 8px;font-size:12.5px}
+  .marca h1{font-size:19px}
+}
+@media (min-width:561px) and (max-width:860px){
+  .tablero{grid-template-columns:repeat(auto-fill,minmax(124px,1fr))}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="marca">
+    <h1>El Pino<span class="ltda"> Ltda.</span></h1>
+    <span class="lema">Registro de móviles y conductores</span>
+  </div>
+  <div class="acciones">
+    <button class="btn btn-senal" id="bNuevo">+ Nuevo<span class="largo"> registro</span></button>
+    <button class="btn btn-borde" id="bImportar">Importar<span class="largo"> respaldo</span></button>
+    <div class="menu">
+      <button class="btn btn-borde" id="bExportar" aria-haspopup="true" aria-expanded="false">Exportar ▾</button>
+      <div class="menu-lista" id="menuExportar" hidden>
+        <button id="expJson">Respaldo completo (.json)<small>Datos y fotos. Sirve para restaurar o pasar a otro equipo.</small></button>
+        <button id="expCsv">Planilla para Excel (.csv)<small>Solo datos, sin fotos.</small></button>
+      </div>
+    </div>
+  </div>
+  <input type="file" id="archivoImportar" accept=".json,application/json" hidden>
+</header>
+
+<main>
+  <aside class="lista" aria-label="Listado de móviles">
+    <div class="filtros">
+      <label class="sr" for="buscar">Buscar</label>
+      <input class="buscar" id="buscar" type="search" placeholder="Buscar por móvil, nombre, RUT o teléfono">
+      <div class="chips" role="group" aria-label="Filtrar">
+        <button class="chip" data-f="todos" aria-pressed="true">Todos</button>
+        <button class="chip" data-f="con">Con conductor</button>
+        <button class="chip" data-f="sin">Sin conductor</button>
+        <button class="chip" data-f="incompletos">Faltan documentos</button>
+      </div>
+      <div class="resumen" id="resumen"></div>
+    </div>
+    <div class="tablero" id="tablero"></div>
+  </aside>
+
+  <section class="ficha" id="ficha" aria-live="polite"></section>
+</main>
+
+<footer class="pie-app">
+  <span id="pieAlmacen">Los datos se guardan en este navegador.</span>
+  <span id="pieRespaldo"></span>
+</footer>
+
+<!-- Diálogo: nuevo registro -->
+<dialog id="dlgNuevo">
+  <form class="dlg" method="dialog" id="formNuevo">
+    <h2>Nuevo registro</h2>
+    <p>Indica el número de móvil. Luego podrás completar los datos del conductor y subir sus documentos.</p>
+    <div class="campo">
+      <label for="nuevoMovil">Número de móvil</label>
+      <input id="nuevoMovil" type="number" min="1" step="1" required>
+      <span class="ayuda" id="nuevoAyuda"></span>
+    </div>
+    <div class="pie">
+      <button class="btn btn-claro" value="cancelar" formnovalidate>Cancelar</button>
+      <button class="btn btn-pino" value="ok" id="nuevoOk">Crear registro</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Diálogo: confirmar -->
+<dialog id="dlgConfirmar">
+  <div class="dlg">
+    <h2 id="confTitulo"></h2>
+    <p id="confTexto"></p>
+    <div class="pie" id="confPie"></div>
+  </div>
+</dialog>
+
+<!-- Visor de imagen -->
+<dialog id="visor">
+  <img id="visorImg" alt="">
+  <div class="vpie">
+    <span id="visorTxt"></span>
+    <button class="btn btn-claro" id="visorCerrar">Cerrar</button>
+  </div>
+</dialog>
+
+<!-- Elegir origen de la foto -->
+<dialog id="dlgFuente">
+  <div class="dlg">
+    <h2>Agregar foto</h2>
+    <p id="fuenteTxt"></p>
+    <div class="fuentes">
+      <button class="fuente" data-fuente="camara"><span class="ico" aria-hidden="true">📷</span><span><b>Tomar foto con la cámara</b><small>Usa la cámara del celular, tablet o computador</small></span></button>
+      <button class="fuente" data-fuente="archivo"><span class="ico" aria-hidden="true">🗂️</span><span><b>Elegir un archivo</b><small>Una imagen guardada en el equipo o la galería</small></span></button>
+    </div>
+    <div class="pie"><button class="btn btn-claro" data-fuente="">Cancelar</button></div>
+  </div>
+</dialog>
+
+<!-- Cámara en vivo (computador / tablet) -->
+<dialog id="dlgCamara">
+  <div class="vista"><video id="camVideo" playsinline autoplay muted></video></div>
+  <div class="cam-pie">
+    <span class="titulo" id="camTxt"></span>
+    <button class="btn btn-claro" id="camCambiar" hidden>Cambiar cámara</button>
+    <button class="btn btn-claro" id="camCancelar">Cancelar</button>
+    <button class="disparo" id="camDisparar" aria-label="Tomar foto" disabled></button>
+  </div>
+</dialog>
+
+<input type="file" id="archivoFoto" accept="image/*" hidden>
+<input type="file" id="camaraFoto" accept="image/*" capture="environment" hidden>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- Definición de campos ---------- */
+const DOCS = [
+  ['fotoCarnet','Foto carnet'],
+  ['cedulaFrontal','Cédula de identidad · frontal'],
+  ['cedulaReverso','Cédula de identidad · reverso'],
+  ['licenciaFrontal','Licencia de conducir · frontal'],
+  ['licenciaReverso','Licencia de conducir · reverso'],
+  ['permisoFrontal','Permiso de circulación · frontal'],
+  ['permisoReverso','Permiso de circulación · reverso'],
+  ['vehiculoFrontal','Foto vehículo · frontal'],
+  ['vehiculoCostado','Foto vehículo · costado'],
+];
+const CAMPOS = [
+  {k:'nombre', l:'Nombre'},
+  {k:'apellido', l:'Apellido'},
+  {k:'cedula', l:'Cédula de identidad (RUT)', ph:'12.345.678-9'},
+  {k:'nacionalidad', l:'Nacionalidad', lista:'listaNac'},
+  {k:'estadoCivil', l:'Estado civil', opciones:['','Soltero/a','Casado/a','Conviviente civil','Separado/a','Divorciado/a','Viudo/a']},
+  {k:'telefono', l:'Teléfono', ph:'+56 9 1234 5678', tipo:'tel'},
+  {k:'direccion', l:'Dirección', ancho:true},
+];
+const NACIONALIDADES = ['Chilena','Venezolana','Haitiana','Peruana','Colombiana','Boliviana','Argentina','Ecuatoriana','Dominicana','Cubana'];
+
+/* ---------- Base de datos (IndexedDB) ---------- */
+const DB_NOMBRE = 'registro-el-pino', DB_VER = 1, ST = 'registros', META = 'meta';
+let db;
+function abrirDB(){
+  return new Promise((ok, mal) => {
+    const req = indexedDB.open(DB_NOMBRE, DB_VER);
+    req.onupgradeneeded = () => {
+      const d = req.result;
+      if(!d.objectStoreNames.contains(ST)) d.createObjectStore(ST, {keyPath:'movil'});
+      if(!d.objectStoreNames.contains(META)) d.createObjectStore(META);
+    };
+    req.onsuccess = () => ok(req.result);
+    req.onerror = () => mal(req.error);
+  });
+}
+function tx(store, modo, fn){
+  return new Promise((ok, mal) => {
+    const t = db.transaction(store, modo);
+    const s = t.objectStore(store);
+    let res;
+    const r = fn(s);
+    if(r && 'onsuccess' in r) r.onsuccess = () => { res = r.result; };
+    t.oncomplete = () => ok(res);
+    t.onerror = () => mal(t.error);
+    t.onabort = () => mal(t.error || new Error('Operación cancelada'));
+  });
+}
+const dbTodos = () => tx(ST,'readonly', s => s.getAll());
+const dbGuardar = r => tx(ST,'readwrite', s => s.put(r));
+const dbBorrar = m => tx(ST,'readwrite', s => s.delete(m));
+const dbVaciar = () => tx(ST,'readwrite', s => s.clear());
+const metaGet = k => tx(META,'readonly', s => s.get(k));
+const metaSet = (k,v) => tx(META,'readwrite', s => s.put(v,k));
+function dbGuardarVarios(lista){
+  return new Promise((ok, mal) => {
+    const t = db.transaction(ST,'readwrite'); const s = t.objectStore(ST);
+    lista.forEach(r => s.put(r));
+    t.oncomplete = ok; t.onerror = () => mal(t.error);
+  });
+}
+
+/* ---------- Estado ---------- */
+let registros = [];          // copia en memoria (ordenada)
+let filtro = 'todos', texto = '';
+let actual = null;           // movil seleccionado
+let borrador = null;         // copia editable del registro abierto
+let sucio = false;
+
+/* ---------- Utilidades ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nombreCompleto = r => [r.nombre, r.apellido].filter(Boolean).join(' ');
+const tieneConductor = r => !!(r.nombre || r.apellido);
+const nDocs = r => DOCS.filter(([k]) => r.docs && r.docs[k]).length;
+const normal = s => String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const clon = o => JSON.parse(JSON.stringify(o));
+function nuevoRegistro(movil){
+  return {movil, nombre:'', apellido:'', cedula:'', nacionalidad:'', estadoCivil:'', direccion:'', telefono:'', docs:{}, actualizado:new Date().toISOString()};
+}
+function fecha(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-CL') + ' ' + d.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+}
+let toastT;
+function aviso(msg, error=false){
+  const t = $('#toast'); t.textContent = msg; t.classList.toggle('error', error); t.classList.add('ver');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('ver'), 3200);
+}
+function descargar(nombre, contenido, tipo){
+  const blob = contenido instanceof Blob ? contenido : new Blob([contenido], {type:tipo});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nombre;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+const hoy = () => new Date().toISOString().slice(0,10);
+
+/* RUT chileno: valida dígito verificador (solo aviso, no bloquea) */
+function rutValido(rut){
+  const limpio = String(rut).replace(/[^0-9kK]/g,'').toUpperCase();
+  if(limpio.length < 2) return null;
+  const cuerpo = limpio.slice(0,-1), dv = limpio.slice(-1);
+  let suma = 0, m = 2;
+  for(let i = cuerpo.length-1; i >= 0; i--){ suma += +cuerpo[i] * m; m = m === 7 ? 2 : m+1; }
+  const r = 11 - (suma % 11);
+  const esperado = r === 11 ? '0' : r === 10 ? 'K' : String(r);
+  return dv === esperado;
+}
+
+/* Reduce fotos grandes para no llenar el almacenamiento */
+function procesarImagen(file){
+  return new Promise((ok, mal) => {
+    if(!file.type.startsWith('image/')) return mal(new Error('El archivo no es una imagen.'));
+    const fr = new FileReader();
+    fr.onerror = () => mal(new Error('No se pudo leer el archivo.'));
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = () => mal(new Error('El formato de imagen no es compatible con este navegador.'));
+      img.onload = () => {
+        const MAX = 1600;
+        const f = Math.min(1, MAX / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * f); c.height = Math.round(img.height * f);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        ok({nombre:file.name, data:c.toDataURL('image/jpeg', 0.82)});
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+/* ---------- Listado ---------- */
+async function cargar(){
+  registros = (await dbTodos()).sort((a,b) => a.movil - b.movil);
+  pintarTablero();
+  pintarPie();
+}
+function filtrados(){
+  const q = normal(texto.trim());
+  return registros.filter(r => {
+    if(filtro === 'con' && !tieneConductor(r)) return false;
+    if(filtro === 'sin' && tieneConductor(r)) return false;
+    if(filtro === 'incompletos' && (!tieneConductor(r) || nDocs(r) === DOCS.length)) return false;
+    if(!q) return true;
+    const hay = normal([r.movil, r.nombre, r.apellido, r.cedula, r.telefono, r.direccion].join(' '));
+    return q.split(/\s+/).every(p => hay.includes(p));
+  });
+}
+function pintarTablero(){
+  const lista = filtrados();
+  const con = registros.filter(tieneConductor).length;
+  $('#resumen').textContent = registros.length
+    ? `${registros.length} móviles · ${con} con conductor · mostrando ${lista.length}`
+    : 'Sin registros todavía';
+  const tab = $('#tablero');
+  if(!registros.length){ tab.innerHTML = ''; pintarFicha(); return; }
+  if(!lista.length){ tab.innerHTML = `<p class="resumen" style="grid-column:1/-1">Ningún móvil coincide con la búsqueda. Prueba con otro nombre o número.</p>`; return; }
+  tab.innerHTML = lista.map(r => {
+    const n = nDocs(r), libre = !tieneConductor(r);
+    return `<button class="placa${libre ? ' libre' : ''}" data-m="${r.movil}" ${r.movil === actual ? 'aria-current="true"' : ''} aria-label="Móvil ${r.movil}${libre ? ', sin conductor' : ', ' + esc(nombreCompleto(r))}">
+      <span class="num">${r.movil}</span>
+      <span class="nom">${libre ? 'Sin conductor' : esc(nombreCompleto(r))}</span>
+      <span class="docs"><span class="barra"><i style="width:${n/DOCS.length*100}%"></i></span>${n}/${DOCS.length}</span>
+    </button>`;
+  }).join('');
+}
+
+/* ---------- Ficha ---------- */
+function pintarFicha(){
+  const f = $('#ficha');
+  document.body.classList.toggle('con-ficha', actual !== null);
+  if(actual === null || !borrador){
+    f.innerHTML = registros.length
+      ? `<div class="vacio"><h2>Selecciona un móvil</h2><p>Elige un número del listado para ver y editar los datos del conductor y sus documentos.</p></div>`
+      : `<div class="vacio"><h2>Aún no hay registros</h2>
+          <p>Si ya tienes el respaldo con los datos del antiguo registro de Access, impórtalo para empezar. También puedes crear el primer móvil desde cero.</p>
+          <div class="acciones"><button class="btn btn-pino" data-acc="importar">Importar respaldo</button><button class="btn btn-claro" data-acc="nuevo">Crear registro</button></div></div>`;
+    return;
+  }
+  const r = borrador;
+  const rv = r.cedula ? rutValido(r.cedula) : null;
+  f.innerHTML = `
+  <div class="ficha-cab">
+    <button class="btn btn-claro volver" data-acc="volver">‹ Volver</button>
+    <span class="placa-grande">${r.movil}</span>
+    <div>
+      <h2>${esc(nombreCompleto(r)) || 'Sin conductor asignado'}</h2>
+      <div class="sub">${r.actualizado ? 'Última modificación: ' + fecha(r.actualizado) : ''} <span class="cambios" id="marcaCambios">${sucio ? '· Cambios sin guardar' : ''}</span></div>
+    </div>
+    <div class="der">
+      <button class="btn btn-claro" data-acc="descartar" ${sucio ? '' : 'disabled'}>Descartar cambios</button>
+      <button class="btn btn-pino" data-acc="guardar" ${sucio ? '' : 'disabled'}>Guardar cambios</button>
+    </div>
+  </div>
+  <div class="cuerpo">
+    <section class="bloque">
+      <h3>Datos del conductor</h3>
+      <div class="campos">
+        <div class="campo">
+          <label for="c_movil">Número de móvil</label>
+          <input id="c_movil" data-k="movil" type="number" min="1" step="1" value="${r.movil}">
+          <span class="ayuda" id="ay_movil"></span>
+        </div>
+        ${CAMPOS.map(c => {
+          const v = esc(r[c.k]);
+          let ctrl;
+          if(c.opciones){
+            const ops = c.opciones.includes(r[c.k]) ? c.opciones : [...c.opciones, r[c.k]];
+            ctrl = `<select id="c_${c.k}" data-k="${c.k}">${ops.map(o => `<option value="${esc(o)}" ${o === r[c.k] ? 'selected' : ''}>${o ? esc(o) : '—'}</option>`).join('')}</select>`;
+          } else {
+            ctrl = `<input id="c_${c.k}" data-k="${c.k}" type="${c.tipo||'text'}" value="${v}" ${c.ph ? `placeholder="${c.ph}"` : ''} ${c.lista ? `list="${c.lista}"` : ''} autocomplete="off">`;
+          }
+          const ayuda = c.k === 'cedula'
+            ? `<span class="ayuda ${rv === false ? 'mal' : ''}" id="ay_cedula">${rv === false ? 'El dígito verificador no coincide. Revisa el RUT.' : ''}</span>` : '';
+          return `<div class="campo${c.ancho ? ' ancho' : ''}"><label for="c_${c.k}">${c.l}</label>${ctrl}${ayuda}</div>`;
+        }).join('')}
+      </div>
+      <datalist id="listaNac">${NACIONALIDADES.map(n => `<option value="${n}">`).join('')}</datalist>
+    </section>
+
+    <section class="bloque">
+      <h3>Documentos y fotos (${nDocs(r)} de ${DOCS.length})</h3>
+      <div class="docs-grid">
+        ${DOCS.map(([k, l]) => {
+          const d = r.docs[k];
+          return `<div class="doc" data-doc="${k}">
+            <div class="titulo">${l}</div>
+            ${d
+              ? `<div class="marco" data-acc="ver" title="Ver en grande"><img src="${d.data}" alt="${l}, móvil ${r.movil}" loading="lazy"></div>
+                 <div class="ops"><button data-acc="ver">Ver</button><button data-acc="subir">Cambiar</button><button data-acc="bajar">Descargar</button><button class="quitar" data-acc="quitar">Quitar</button></div>`
+              : `<div class="marco sin" data-acc="subir" tabindex="0" role="button" aria-label="Agregar ${l}"><b>+</b>Agregar foto<br><span style="font-size:12px">cámara o archivo</span></div>
+                 <div class="ops dos"><button data-acc="camara">📷 Cámara</button><button data-acc="archivo">🗂️ Archivo</button></div>`}
+          </div>`;
+        }).join('')}
+      </div>
+    </section>
+
+    <section class="bloque">
+      <h3>Eliminar</h3>
+      <p class="resumen" style="margin:0 0 10px">Elimina el móvil ${r.movil} junto con todos sus datos y fotos.</p>
+      <button class="btn btn-peligro" data-acc="eliminar">Eliminar registro</button>
+    </section>
+  </div>`;
+}
+function marcarSucio(){
+  if(sucio) return;
+  sucio = true;
+  $('#marcaCambios').textContent = '· Cambios sin guardar';
+  document.querySelectorAll('[data-acc="guardar"],[data-acc="descartar"]').forEach(b => b.disabled = false);
+}
+async function abrir(movil){
+  if(movil === actual) { document.body.classList.add('con-ficha'); marcarHistorial(); return; }
+  if(sucio && !(await confirmar('Hay cambios sin guardar', `Los cambios del móvil ${actual} se perderán si sales ahora.`, 'Salir sin guardar', true))) return;
+  const r = registros.find(x => x.movil === movil);
+  if(!r) return;
+  actual = movil; borrador = clon(r); sucio = false;
+  if(!borrador.docs) borrador.docs = {};
+  pintarTablero(); pintarFicha();
+  $('#ficha').scrollTop = 0;
+  marcarHistorial();
+}
+async function cerrar(){
+  if(sucio && !(await confirmar('Hay cambios sin guardar', 'Los cambios se perderán si sales ahora.', 'Salir sin guardar', true))) return false;
+  actual = null; borrador = null; sucio = false;
+  pintarTablero(); pintarFicha();
+  return true;
+}
+/* En celular/tablet, el botón "atrás" del teléfono vuelve al listado */
+const esMovil = () => window.matchMedia('(max-width:860px)').matches;
+let enHistorial = false;
+function marcarHistorial(){ if(esMovil() && !enHistorial){ history.pushState({ficha:true}, ''); enHistorial = true; } }
+function salirFicha(){ if(enHistorial){ history.back(); } else { cerrar(); } }
+window.addEventListener('popstate', async () => {
+  enHistorial = false;
+  if(actual === null) return;
+  const ok = await cerrar();
+  if(!ok) marcarHistorial();
+});
+
+async function guardar(){
+  const nuevo = parseInt(borrador.movil, 10);
+  if(!Number.isInteger(nuevo) || nuevo < 1){ aviso('El número de móvil debe ser un entero mayor que 0.', true); return; }
+  if(nuevo !== actual && registros.some(x => x.movil === nuevo)){ aviso(`Ya existe el móvil ${nuevo}. Usa otro número.`, true); return; }
+  borrador.movil = nuevo;
+  borrador.actualizado = new Date().toISOString();
+  try{
+    if(nuevo !== actual) await dbBorrar(actual);
+    await dbGuardar(borrador);
+  }catch(e){
+    aviso(e && e.name === 'QuotaExceededError' ? 'El navegador no tiene más espacio. Exporta un respaldo y quita fotos que no uses.' : 'No se pudo guardar: ' + (e.message || e), true);
+    return;
+  }
+  actual = nuevo; sucio = false;
+  await cargar();
+  borrador = clon(registros.find(x => x.movil === actual));
+  pintarFicha();
+  aviso(`Móvil ${actual} guardado`);
+}
+async function eliminar(){
+  const r = borrador, n = nDocs(r);
+  const ok = await confirmar(`Eliminar el móvil ${r.movil}`,
+    `Se borrarán los datos${tieneConductor(r) ? ' de ' + nombreCompleto(r) : ''}${n ? ` y ${n} foto${n>1?'s':''}` : ''}. Esta acción no se puede deshacer.`,
+    'Eliminar registro', true);
+  if(!ok) return;
+  await dbBorrar(actual);
+  const m = actual;
+  actual = null; borrador = null; sucio = false;
+  await cargar(); pintarFicha();
+  if(enHistorial){ enHistorial = false; history.back(); }
+  aviso(`Móvil ${m} eliminado`);
+}
+
+/* ---------- Fotos ---------- */
+let docDestino = null;
+const nombreDoc = k => DOCS.find(x => x[0] === k)[1];
+function pedirFoto(k){
+  docDestino = k;
+  $('#fuenteTxt').textContent = `Móvil ${borrador.movil} · ${nombreDoc(k)}`;
+  $('#dlgFuente').showModal();
+}
+function elegirArchivo(k){ docDestino = k; const i = $('#archivoFoto'); i.value = ''; i.click(); }
+/* Celular/tablet táctil: cámara nativa del sistema. Computador: cámara en vivo con getUserMedia. */
+const pantallaTactil = () => window.matchMedia('(pointer:coarse)').matches;
+function abrirCamara(k){
+  docDestino = k;
+  if(pantallaTactil() || !(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){
+    const i = $('#camaraFoto'); i.value = ''; i.click();
+  } else {
+    camaraEnVivo(k);
+  }
+}
+let camStream = null, camModo = 'environment', camDispositivos = [];
+function detenerCamara(){
+  if(camStream){ camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+  $('#camVideo').srcObject = null;
+}
+async function iniciarStream(){
+  detenerCamara();
+  $('#camDisparar').disabled = true;
+  camStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:camModo, width:{ideal:1920}, height:{ideal:1080}}, audio:false});
+  const v = $('#camVideo'); v.srcObject = camStream;
+  await v.play().catch(()=>{});
+  $('#camDisparar').disabled = false;
+}
+async function camaraEnVivo(k){
+  $('#camTxt').textContent = `Móvil ${borrador.movil} · ${nombreDoc(k)}`;
+  $('#dlgCamara').showModal();
+  try{
+    await iniciarStream();
+    camDispositivos = (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'videoinput');
+    $('#camCambiar').hidden = camDispositivos.length < 2;
+  }catch(e){
+    $('#dlgCamara').close();
+    const msj = e && e.name === 'NotAllowedError' ? 'No se dio permiso para usar la cámara. Actívalo en el candado de la barra de direcciones.'
+              : e && e.name === 'NotFoundError' ? 'No se encontró ninguna cámara en este equipo.'
+              : 'No se pudo abrir la cámara. Si abriste el archivo directo del disco, pruébalo desde la página publicada (https).';
+    aviso(msj, true);
+  }
+}
+function capturarFoto(){
+  const v = $('#camVideo');
+  if(!v.videoWidth) return;
+  const MAX = 1600, f = Math.min(1, MAX / Math.max(v.videoWidth, v.videoHeight));
+  const c = document.createElement('canvas');
+  c.width = Math.round(v.videoWidth * f); c.height = Math.round(v.videoHeight * f);
+  c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+  borrador.docs[docDestino] = {nombre:`camara_${docDestino}_${Date.now()}.jpg`, data:c.toDataURL('image/jpeg', 0.82)};
+  $('#dlgCamara').close();
+  marcarSucio(); pintarFicha();
+  aviso('Foto tomada. Recuerda guardar los cambios.');
+}
+async function ponerFoto(k, file){
+  try{
+    borrador.docs[k] = await procesarImagen(file);
+    marcarSucio(); pintarFicha();
+  }catch(e){ aviso(e.message, true); }
+}
+function verFoto(k){
+  const d = borrador.docs[k]; if(!d) return;
+  const l = DOCS.find(x => x[0] === k)[1];
+  $('#visorImg').src = d.data; $('#visorImg').alt = l;
+  $('#visorTxt').textContent = `Móvil ${borrador.movil} · ${l}`;
+  $('#visor').showModal();
+}
+function bajarFoto(k){
+  const d = borrador.docs[k]; if(!d) return;
+  const bin = atob(d.data.split(',')[1]); const u = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i] = bin.charCodeAt(i);
+  descargar(`movil_${borrador.movil}_${k}.jpg`, new Blob([u],{type:'image/jpeg'}));
+}
+
+/* ---------- Diálogos ---------- */
+function confirmar(titulo, textoMsg, txtOk, peligro=false){
+  return new Promise(ok => {
+    const d = $('#dlgConfirmar');
+    $('#confTitulo').textContent = titulo; $('#confTexto').textContent = textoMsg;
+    $('#confPie').innerHTML = `<button class="btn btn-claro" data-r="0">Cancelar</button><button class="btn ${peligro ? 'btn-peligro-lleno' : 'btn-pino'}" data-r="1">${esc(txtOk)}</button>`;
+    const fin = v => { d.close(); ok(v); };
+    $('#confPie').onclick = e => { const b = e.target.closest('button'); if(b) fin(b.dataset.r === '1'); };
+    d.oncancel = e => { e.preventDefault(); fin(false); };
+    d.showModal();
+  });
+}
+function elegir(titulo, textoMsg, opciones){
+  return new Promise(ok => {
+    const d = $('#dlgConfirmar');
+    $('#confTitulo').textContent = titulo; $('#confTexto').textContent = textoMsg;
+    $('#confPie').innerHTML = `<button class="btn btn-claro" data-r="">Cancelar</button>` +
+      opciones.map(o => `<button class="btn ${o.clase}" data-r="${o.v}">${esc(o.t)}</button>`).join('');
+    const fin = v => { d.close(); ok(v); };
+    $('#confPie').onclick = e => { const b = e.target.closest('button'); if(b) fin(b.dataset.r || null); };
+    d.oncancel = e => { e.preventDefault(); fin(null); };
+    d.showModal();
+  });
+}
+function siguienteLibre(){
+  let n = 1; const usados = new Set(registros.map(r => r.movil));
+  while(usados.has(n)) n++;
+  return n;
+}
+async function dialogoNuevo(){
+  if(sucio && !(await confirmar('Hay cambios sin guardar', `Los cambios del móvil ${actual} se perderán.`, 'Continuar sin guardar', true))) return;
+  sucio = false;
+  const d = $('#dlgNuevo'), inp = $('#nuevoMovil');
+  inp.value = siguienteLibre(); validarNuevo();
+  d.showModal(); inp.select();
+}
+function validarNuevo(){
+  const v = parseInt($('#nuevoMovil').value, 10);
+  const ay = $('#nuevoAyuda'), ok = $('#nuevoOk');
+  if(!Number.isInteger(v) || v < 1){ ay.textContent = 'Ingresa un número entero mayor que 0.'; ay.className = 'ayuda mal'; ok.disabled = true; return false; }
+  if(registros.some(r => r.movil === v)){ ay.textContent = `El móvil ${v} ya existe. Ábrelo desde el listado para editarlo.`; ay.className = 'ayuda mal'; ok.disabled = true; return false; }
+  ay.textContent = 'Número disponible.'; ay.className = 'ayuda'; ok.disabled = false; return true;
+}
+
+/* ---------- Exportar / importar ---------- */
+async function exportarJson(){
+  const datos = {app:'registro-el-pino', version:1, exportado:new Date().toISOString(), registros:await dbTodos()};
+  descargar(`respaldo_el_pino_${hoy()}.json`, JSON.stringify(datos), 'application/json');
+  await metaSet('ultimoRespaldo', datos.exportado); pintarPie();
+  aviso('Respaldo descargado');
+}
+async function exportarCsv(){
+  const cols = [['movil','Número móvil'], ...CAMPOS.map(c => [c.k, c.l]), ['docs','Documentos cargados'], ['actualizado','Última modificación']];
+  const celda = v => { v = String(v ?? ''); return /[";\n\r]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
+  const filas = [cols.map(c => celda(c[1])).join(';')];
+  registros.forEach(r => filas.push(cols.map(([k]) => celda(k === 'docs' ? `${nDocs(r)}/${DOCS.length}` : k === 'actualizado' ? fecha(r.actualizado) : r[k])).join(';')));
+  descargar(`registro_el_pino_${hoy()}.csv`, '\uFEFF' + filas.join('\r\n'), 'text/csv;charset=utf-8');
+  aviso('Planilla descargada');
+}
+function validarImportado(obj){
+  const lista = Array.isArray(obj) ? obj : obj && obj.registros;
+  if(!Array.isArray(lista)) throw new Error('El archivo no es un respaldo de este registro.');
+  return lista.map(r => {
+    const m = parseInt(r.movil, 10);
+    if(!Number.isInteger(m) || m < 1) throw new Error('Hay un registro sin número de móvil válido.');
+    const base = nuevoRegistro(m);
+    CAMPOS.forEach(c => base[c.k] = r[c.k] == null ? '' : String(r[c.k]));
+    base.docs = {};
+    DOCS.forEach(([k]) => { const d = r.docs && r.docs[k]; if(d && typeof d.data === 'string' && d.data.startsWith('data:image/')) base.docs[k] = {nombre:String(d.nombre||k), data:d.data}; });
+    base.actualizado = r.actualizado || base.actualizado;
+    return base;
+  });
+}
+async function importar(file){
+  let lista;
+  try{ lista = validarImportado(JSON.parse(await file.text())); }
+  catch(e){ aviso(e instanceof SyntaxError ? 'El archivo no es un JSON válido.' : e.message, true); return; }
+  let modo = 'reemplazar';
+  if(registros.length){
+    modo = await elegir('Importar respaldo',
+      `El archivo trae ${lista.length} registros y ya tienes ${registros.length}. "Combinar" actualiza los móviles con el mismo número y agrega los nuevos. "Reemplazar todo" borra lo actual primero.`,
+      [{v:'combinar', t:'Combinar', clase:'btn-pino'}, {v:'reemplazar', t:'Reemplazar todo', clase:'btn-peligro-lleno'}]);
+    if(!modo) return;
+  }
+  try{
+    if(modo === 'reemplazar') await dbVaciar();
+    await dbGuardarVarios(lista);
+  }catch(e){
+    aviso(e && e.name === 'QuotaExceededError' ? 'El navegador no tiene espacio suficiente para este respaldo.' : 'No se pudo importar: ' + (e.message||e), true);
+    return;
+  }
+  actual = null; borrador = null; sucio = false;
+  await cargar(); pintarFicha();
+  aviso(`${lista.length} registros importados`);
+}
+
+/* ---------- Pie ---------- */
+async function pintarPie(){
+  const u = await metaGet('ultimoRespaldo');
+  $('#pieRespaldo').textContent = u ? `Último respaldo descargado: ${fecha(u)}` : 'Aún no has descargado un respaldo. Hazlo de vez en cuando desde Exportar.';
+  if(navigator.storage && navigator.storage.estimate){
+    const e = await navigator.storage.estimate();
+    if(e.usage) $('#pieAlmacen').textContent = `Los datos se guardan en este navegador (${(e.usage/1048576).toFixed(1)} MB usados).`;
+  }
+}
+
+/* ---------- Eventos ---------- */
+$('#tablero').addEventListener('click', e => { const b = e.target.closest('.placa'); if(b) abrir(+b.dataset.m); });
+$('#buscar').addEventListener('input', e => { texto = e.target.value; pintarTablero(); });
+document.querySelector('.chips').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if(!b) return;
+  filtro = b.dataset.f;
+  document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === b));
+  pintarTablero();
+});
+
+const ficha = $('#ficha');
+ficha.addEventListener('input', e => {
+  const k = e.target.dataset.k; if(!k || !borrador) return;
+  borrador[k] = e.target.value;
+  if(k === 'cedula'){
+    const v = rutValido(e.target.value), ay = $('#ay_cedula');
+    ay.textContent = v === false ? 'El dígito verificador no coincide. Revisa el RUT.' : '';
+    ay.classList.toggle('mal', v === false);
+  }
+  if(k === 'movil'){
+    const n = parseInt(e.target.value,10), ay = $('#ay_movil');
+    ay.textContent = n !== actual && registros.some(x => x.movil === n) ? `El móvil ${n} ya existe.` : '';
+    ay.classList.add('mal');
+  }
+  marcarSucio();
+});
+ficha.addEventListener('click', e => {
+  const b = e.target.closest('[data-acc]'); if(!b) return;
+  const k = b.closest('[data-doc]')?.dataset.doc;
+  switch(b.dataset.acc){
+    case 'guardar': guardar(); break;
+    case 'descartar': borrador = clon(registros.find(x => x.movil === actual)); sucio = false; pintarFicha(); aviso('Cambios descartados'); break;
+    case 'eliminar': eliminar(); break;
+    case 'volver': salirFicha(); break;
+    case 'nuevo': dialogoNuevo(); break;
+    case 'importar': $('#archivoImportar').click(); break;
+    case 'subir': pedirFoto(k); break;
+    case 'camara': abrirCamara(k); break;
+    case 'archivo': elegirArchivo(k); break;
+    case 'ver': verFoto(k); break;
+    case 'bajar': bajarFoto(k); break;
+    case 'quitar': delete borrador.docs[k]; marcarSucio(); pintarFicha(); break;
+  }
+});
+ficha.addEventListener('keydown', e => {
+  if((e.key === 'Enter' || e.key === ' ') && e.target.matches('.marco.sin')){ e.preventDefault(); pedirFoto(e.target.closest('[data-doc]').dataset.doc); }
+});
+// Arrastrar y soltar fotos sobre cada documento
+ficha.addEventListener('dragover', e => { const m = e.target.closest('.marco'); if(m){ e.preventDefault(); m.classList.add('arrastre'); } });
+ficha.addEventListener('dragleave', e => { const m = e.target.closest('.marco'); if(m) m.classList.remove('arrastre'); });
+ficha.addEventListener('drop', e => {
+  const m = e.target.closest('.marco'); if(!m) return;
+  e.preventDefault(); m.classList.remove('arrastre');
+  const f = e.dataTransfer.files[0]; if(f) ponerFoto(m.closest('[data-doc]').dataset.doc, f);
+});
+$('#archivoFoto').addEventListener('change', e => { const f = e.target.files[0]; if(f && docDestino) ponerFoto(docDestino, f); });
+$('#camaraFoto').addEventListener('change', e => { const f = e.target.files[0]; if(f && docDestino) ponerFoto(docDestino, f); });
+$('#dlgFuente').addEventListener('click', e => {
+  const b = e.target.closest('[data-fuente]');
+  if(!b){ if(e.target.id === 'dlgFuente') $('#dlgFuente').close(); return; }
+  $('#dlgFuente').close();
+  if(b.dataset.fuente === 'camara') abrirCamara(docDestino);
+  else if(b.dataset.fuente === 'archivo') elegirArchivo(docDestino);
+});
+$('#camDisparar').addEventListener('click', capturarFoto);
+$('#camCancelar').addEventListener('click', () => $('#dlgCamara').close());
+$('#camCambiar').addEventListener('click', async () => {
+  camModo = camModo === 'environment' ? 'user' : 'environment';
+  try{ await iniciarStream(); }catch(e){ aviso('No se pudo cambiar de cámara.', true); }
+});
+$('#dlgCamara').addEventListener('close', detenerCamara);
+
+document.addEventListener('keydown', e => {
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && sucio){ e.preventDefault(); guardar(); }
+});
+
+$('#bNuevo').addEventListener('click', dialogoNuevo);
+$('#nuevoMovil').addEventListener('input', validarNuevo);
+$('#dlgNuevo').addEventListener('close', async () => {
+  if($('#dlgNuevo').returnValue !== 'ok' || !validarNuevo()) return;
+  const m = parseInt($('#nuevoMovil').value, 10);
+  await dbGuardar(nuevoRegistro(m));
+  await cargar();
+  actual = null; sucio = false;
+  await abrir(m);
+  $('#c_nombre')?.focus();
+  aviso(`Móvil ${m} creado`);
+});
+
+$('#bImportar').addEventListener('click', () => { const i = $('#archivoImportar'); i.value=''; i.click(); });
+$('#archivoImportar').addEventListener('change', e => { const f = e.target.files[0]; if(f) importar(f); });
+
+const menu = $('#menuExportar'), bExp = $('#bExportar');
+bExp.addEventListener('click', e => { e.stopPropagation(); menu.hidden = !menu.hidden; bExp.setAttribute('aria-expanded', !menu.hidden); });
+document.addEventListener('click', () => { menu.hidden = true; bExp.setAttribute('aria-expanded','false'); });
+$('#expJson').addEventListener('click', exportarJson);
+$('#expCsv').addEventListener('click', exportarCsv);
+
+$('#visorCerrar').addEventListener('click', () => $('#visor').close());
+$('#visor').addEventListener('click', e => { if(e.target.id === 'visor') e.target.close(); });
+
+window.addEventListener('beforeunload', e => { if(sucio){ e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------- Inicio ---------- */
+(async () => {
+  try{
+    db = await abrirDB();
+    if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{});
+    await cargar(); pintarFicha(); pintarPie();
+  }catch(e){
+    $('#ficha').innerHTML = `<div class="vacio"><h2>No se pudo abrir el registro</h2><p>Este navegador bloqueó el almacenamiento local (puede pasar en modo incógnito). Abre la página en una ventana normal de Chrome, Edge o Firefox.</p></div>`;
+  }
+})();
+})();
+</script>
+</body>
+</html>
