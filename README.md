@@ -32,6 +32,23 @@ guardan en el navegador del computador donde se usa (IndexedDB). Por eso:
 - Para pasar los datos a otro equipo: exporta el respaldo e impórtalo allá.
 - Borrar el historial/datos de navegación de ese sitio borra el registro.
 
+## Imprimir fichas
+
+Cada ficha sale en **una hoja oficio de 21,59 × 33 cm** con todos los datos del
+conductor y sus 9 fotos (carnet, cédula, licencia, permiso de circulación y
+vehículo). Si falta una foto, queda un recuadro "Sin foto".
+
+- **Una ficha:** abre el móvil y pulsa **Imprimir ficha** (en celular, el ícono 🖨️ de arriba a la derecha).
+- **Varias o todas:** botón **Imprimir** de la barra superior (o `Ctrl + P`). Puedes elegir
+  la ficha abierta, las fichas del listado (según búsqueda y filtro) o todas.
+  Por defecto no se imprimen los móviles sin conductor, para no gastar hojas en blanco;
+  marca "Incluir móviles sin conductor" si los necesitas.
+- En la ventana de impresión del navegador, el tamaño de papel debe ser **Oficio
+  (21,59 × 33 cm, o 8,5 × 13 pulgadas)**. Según la impresora se llama "Oficio", "Folio"
+  o similar; **no uses "Legal"**, que mide 35,6 cm de alto. Deja la escala en **100 %** y
+  desactiva los encabezados y pies de página. Si tu impresora no ofrece ese tamaño,
+  usa "Guardar como PDF" (sale en oficio) y imprime el PDF.
+
 ## Funciones
 
 - Buscar por móvil, nombre, RUT o teléfono; filtrar por con/sin conductor o
@@ -41,4 +58,4 @@ guardan en el navegador del computador donde se usa (IndexedDB). Por eso:
   Las fotos se reducen a 1600 px para ahorrar espacio.
 - Aviso si el dígito verificador del RUT no coincide.
 - Exportar planilla CSV para Excel (sin fotos).
-- `Ctrl + S` guarda los cambios.
+- `Ctrl + S` guarda los cambios. `Ctrl + P` abre la impresión de fichas.

@@ -138,6 +138,18 @@ footer.pie-app{font-size:12px;color:var(--gris);padding:6px 20px;border-top:1px 
 .menu-lista button small{display:block;color:var(--gris);font-size:12px}
 .menu-lista button:hover,.menu-lista button:focus-visible{background:var(--papel)}
 
+.opciones{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.opcion{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--linea);border-radius:8px;cursor:pointer;background:var(--blanco)}
+.opcion:has(input:checked){border-color:var(--pino);background:var(--papel);box-shadow:inset 0 0 0 1px var(--pino)}
+.opcion input{margin-top:3px;accent-color:var(--pino);width:18px;height:18px;flex:none}
+.opcion b{display:block;font-size:15px}
+.opcion small{color:var(--gris);font-size:13px}
+.check{display:flex;align-items:center;gap:10px;font-size:14px;margin:4px 0 6px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--pino);flex:none}
+.imp-mov{display:none}
+#impResumen{margin:10px 0 0;font-size:14px}
+#impResumen.mal{color:var(--rojo)}
+
 /* ---------- Tablet horizontal / notebook chico ---------- */
 @media (max-width:1180px){
   main{grid-template-columns:minmax(280px,360px) 1fr}
@@ -169,6 +181,8 @@ footer.pie-app{font-size:12px;color:var(--gris);padding:6px 20px;border-top:1px 
   body.con-ficha .ficha{display:block}
   body.con-ficha{overflow:hidden}
   .volver{display:inline-flex;white-space:nowrap;flex:none;padding:8px 12px}
+  .imp-desk{display:none}
+  .imp-mov{display:inline-flex;margin-left:auto;flex:none;padding:8px 12px;font-size:18px;line-height:1}
   .marca h1{white-space:nowrap}
   .btn{white-space:nowrap}
   .ficha-cab{padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));gap:12px;flex-wrap:nowrap}
@@ -222,19 +236,63 @@ footer.pie-app{font-size:12px;color:var(--gris);padding:6px 20px;border-top:1px 
   header.top .btn{padding:8px 10px;font-size:13px}
   .ficha-cab .sub{font-size:12px}
 }
+@media (max-width:420px){
+  header.top{flex-wrap:wrap;row-gap:8px}
+  .marca{width:100%}
+  .acciones{width:100%;flex-wrap:nowrap;gap:6px}
+  .acciones>.btn,.acciones>.menu{flex:1 1 0;min-width:0}
+  .acciones>#bImprimir{flex:0 0 auto}
+  .acciones .menu .btn{width:100%}
+  header.top .btn{justify-content:center;padding:8px 6px;font-size:13px}
+}
 @media (max-width:400px){
-  .ltda{display:none}
+  .fmod{display:none}
+  .cambios::before{content:none}
 }
 @media (max-width:380px){
   header.top{padding-left:10px;padding-right:10px;gap:6px}
   .acciones{gap:4px}
-  header.top .btn{padding:8px 8px;font-size:12.5px}
+  header.top .btn{padding:8px 6px;font-size:12.5px}
   .marca h1{font-size:19px}
 }
 @media (min-width:561px) and (max-width:860px){
   .tablero{grid-template-columns:repeat(auto-fill,minmax(124px,1fr))}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---------- Impresión: una ficha por hoja oficio 21,59 × 33 cm ---------- */
+#hojas{display:none}
+@page{size:215.9mm 330mm;margin:0}
+@media print{
+  html,body{height:auto!important;min-height:0!important;display:block!important;background:#fff!important;overflow:visible!important}
+  body>*:not(#hojas){display:none!important}
+  #hojas{display:block}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+.hoja{box-sizing:border-box;width:215.9mm;height:329.5mm;padding:11mm 12mm 9mm;display:flex;flex-direction:column;gap:5mm;overflow:hidden;background:#fff;color:#000;font-family:var(--txt);font-size:10pt;line-height:1.3;break-after:page;page-break-after:always;break-inside:avoid}
+.hoja:last-child{break-after:auto;page-break-after:auto}
+.p-cab{flex:none;display:flex;align-items:stretch;justify-content:space-between;gap:8mm;padding-bottom:4mm;border-bottom:.8mm solid #000}
+.p-marca{display:flex;flex-direction:column;justify-content:center}
+.p-marca b{font-family:var(--cond);font-size:26pt;line-height:1;letter-spacing:.01em;text-transform:uppercase}
+.p-marca span{font-size:10.5pt;margin-top:1.5mm;color:#333}
+.p-placa{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38mm;padding:1mm 5mm;border:.8mm solid #000;border-radius:2mm;background:#F2C230}
+.p-placa small{font-size:8pt;font-weight:600;letter-spacing:.14em}
+.p-placa strong{font-family:var(--cond);font-size:34pt;line-height:1;font-variant-numeric:tabular-nums}
+.p-datos{flex:none;display:flex;gap:6mm;min-height:50mm}
+.p-campos{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:3.5mm 6mm;align-content:start;margin:0}
+.p-campo{margin:0;min-width:0}
+.p-campo.ancho{grid-column:1/-1}
+.p-campo dt{font-size:7.5pt;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:.06em}
+.p-campo dd{margin:0;min-height:6.5mm;padding-top:.8mm;border-bottom:.3mm solid #000;font-size:11.5pt;font-weight:500;overflow-wrap:anywhere}
+.p-doc{margin:0;display:flex;flex-direction:column;min-height:0;min-width:0}
+.p-doc figcaption{flex:none;font-size:8.5pt;font-weight:600;margin-bottom:1mm}
+.p-marco{position:relative;flex:1;min-height:0;border:.3mm solid #555;background:#fff}
+.p-marco.vacia{border-style:dashed;border-color:#999}
+.p-marco img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.p-sin{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9pt;color:#777}
+.p-carnet{width:38mm;flex:none}
+.p-docs{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,minmax(0,1fr));gap:4mm 5mm}
+.p-pie{flex:none;display:flex;justify-content:space-between;gap:8mm;font-size:8pt;color:#444;border-top:.3mm solid #999;padding-top:1.5mm}
 </style>
 </head>
 <body>
@@ -247,6 +305,7 @@ footer.pie-app{font-size:12px;color:var(--gris);padding:6px 20px;border-top:1px 
   <div class="acciones">
     <button class="btn btn-senal" id="bNuevo">+ Nuevo<span class="largo"> registro</span></button>
     <button class="btn btn-borde" id="bImportar">Importar<span class="largo"> respaldo</span></button>
+    <button class="btn btn-borde" id="bImprimir" aria-label="Imprimir fichas">🖨️<span class="largo"> Imprimir</span></button>
     <div class="menu">
       <button class="btn btn-borde" id="bExportar" aria-haspopup="true" aria-expanded="false">Exportar ▾</button>
       <div class="menu-lista" id="menuExportar" hidden>
@@ -343,6 +402,24 @@ footer.pie-app{font-size:12px;color:var(--gris);padding:6px 20px;border-top:1px 
 
 <input type="file" id="archivoFoto" accept="image/*" hidden>
 <input type="file" id="camaraFoto" accept="image/*" capture="environment" hidden>
+<!-- Diálogo: imprimir fichas -->
+<dialog id="dlgImprimir">
+  <div class="dlg">
+    <h2>Imprimir fichas</h2>
+    <p>Cada ficha sale en una hoja oficio (21,59 × 33 cm) con todos sus datos y fotos.</p>
+    <div class="opciones" id="impOpciones"></div>
+    <label class="check" id="impSinWrap"><input type="checkbox" id="impSinConductor"> Incluir móviles sin conductor</label>
+    <p id="impResumen" role="status"></p>
+    <div class="pie">
+      <button class="btn btn-claro" id="impCancelar">Cancelar</button>
+      <button class="btn btn-pino" id="impOk">🖨️ Imprimir</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Hojas para imprimir (se llenan solo al imprimir) -->
+<div id="hojas" aria-hidden="true"></div>
+
 <div class="toast" id="toast" role="status"></div>
 
 <script>
@@ -541,9 +618,11 @@ function pintarFicha(){
     <span class="placa-grande">${r.movil}</span>
     <div>
       <h2>${esc(nombreCompleto(r)) || 'Sin conductor asignado'}</h2>
-      <div class="sub">${r.actualizado ? 'Última modificación: ' + fecha(r.actualizado) : ''} <span class="cambios" id="marcaCambios">${sucio ? '· Cambios sin guardar' : ''}</span></div>
+      <div class="sub"><span class="fmod">${r.actualizado ? 'Última modificación: ' + fecha(r.actualizado) : ''}</span> <span class="cambios" id="marcaCambios">${sucio ? '· Cambios sin guardar' : ''}</span></div>
     </div>
+    <button class="btn btn-claro imp-mov" data-acc="imprimir" aria-label="Imprimir esta ficha">🖨️</button>
     <div class="der">
+      <button class="btn btn-claro imp-desk" data-acc="imprimir">🖨️ Imprimir ficha</button>
       <button class="btn btn-claro" data-acc="descartar" ${sucio ? '' : 'disabled'}>Descartar cambios</button>
       <button class="btn btn-pino" data-acc="guardar" ${sucio ? '' : 'disabled'}>Guardar cambios</button>
     </div>
@@ -841,6 +920,79 @@ async function importar(file){
   aviso(`${lista.length} registros importados`);
 }
 
+/* ---------- Impresión (una hoja oficio 21,59 × 33 cm por ficha) ---------- */
+const DOCS_HOJA = DOCS.filter(([k]) => k !== 'fotoCarnet').map(([k]) => k);
+function hojaHTML(r, n, total){
+  const docs = r.docs || {};
+  const doc = (k, extra='') => {
+    const d = docs[k];
+    return `<figure class="p-doc ${extra}"><figcaption>${esc(nombreDoc(k))}</figcaption><div class="p-marco${d ? '' : ' vacia'}">${d ? `<img src="${esc(d.data)}" alt="">` : '<span class="p-sin">Sin foto</span>'}</div></figure>`;
+  };
+  const campos = CAMPOS.map(c => `<div class="p-campo${c.ancho ? ' ancho' : ''}"><dt>${esc(c.l)}</dt><dd>${esc(r[c.k]) || '&nbsp;'}</dd></div>`).join('');
+  return `<section class="hoja">
+    <header class="p-cab">
+      <div class="p-marca"><b>El Pino Ltda.</b><span>Ficha de conductor y vehículo</span></div>
+      <div class="p-placa"><small>MÓVIL</small><strong>${esc(r.movil)}</strong></div>
+    </header>
+    <div class="p-datos">
+      <dl class="p-campos">${campos}</dl>
+      ${doc('fotoCarnet','p-carnet')}
+    </div>
+    <div class="p-docs">${DOCS_HOJA.map(k => doc(k)).join('')}</div>
+    <footer class="p-pie"><span>Última modificación: ${esc(fecha(r.actualizado)) || '—'} · Impreso el ${new Date().toLocaleDateString('es-CL')}</span><span>Ficha ${n} de ${total}</span></footer>
+  </section>`;
+}
+const hojasHTML = lista => lista.map((r, i) => hojaHTML(r, i + 1, lista.length)).join('');
+function fichasPara(modo, conSin){
+  if(modo === 'esta') return borrador ? [clon(borrador)] : [];
+  const base = modo === 'listado' ? filtrados() : registros;
+  return conSin ? base : base.filter(tieneConductor);
+}
+async function imprimir(lista){
+  if(!lista.length){ aviso('No hay fichas para imprimir con esa selección.', true); return; }
+  const cont = $('#hojas');
+  cont.innerHTML = hojasHTML(lista);
+  aviso(`Preparando ${lista.length} ${lista.length > 1 ? 'fichas' : 'ficha'} para imprimir…`);
+  // Esperar a que las fotos estén listas, si no salen en blanco
+  await Promise.all([...cont.querySelectorAll('img')].map(im => im.decode ? im.decode().catch(() => {}) : null));
+  window.print();
+}
+// Si se imprime desde el menú del navegador (sin pasar por el botón), no dejar la hoja en blanco
+window.addEventListener('beforeprint', () => {
+  const c = $('#hojas');
+  if(!c.innerHTML.trim() && registros.length) c.innerHTML = hojasHTML(fichasPara(borrador ? 'esta' : 'listado', false));
+});
+window.addEventListener('afterprint', () => { $('#hojas').innerHTML = ''; });
+
+function abrirImprimir(){
+  const dlg = $('#dlgImprimir');
+  if(dlg.open || !registros.length) return;
+  const hay = actual !== null && !!borrador;
+  const filtrado = texto.trim() !== '' || filtro !== 'todos';
+  const ops = [];
+  if(hay) ops.push(['esta', `Solo esta ficha (móvil ${borrador.movil})`, 'La que tienes abierta, tal como la ves ahora']);
+  if(filtrado) ops.push(['listado', 'Las fichas del listado', 'Según la búsqueda y el filtro que tienes puestos']);
+  ops.push(['todas', 'Todas las fichas', 'Todo el registro, ordenado por número de móvil']);
+  const marcada = hay ? 'esta' : filtrado ? 'listado' : 'todas';
+  $('#impOpciones').innerHTML = ops.map(([v, t, sub]) =>
+    `<label class="opcion"><input type="radio" name="impModo" value="${v}" ${v === marcada ? 'checked' : ''}><span><b>${esc(t)} <span id="impN_${v}"></span></b><small>${esc(sub)}</small></span></label>`).join('');
+  $('#impSinConductor').checked = filtro === 'sin';
+  actualizarImprimir();
+  dlg.showModal();
+}
+function actualizarImprimir(){
+  const conSin = $('#impSinConductor').checked;
+  ['esta', 'listado', 'todas'].forEach(v => { const el = $('#impN_' + v); if(el) el.textContent = `(${fichasPara(v, conSin).length})`; });
+  const modo = document.querySelector('#dlgImprimir input[name="impModo"]:checked')?.value;
+  const n = modo ? fichasPara(modo, conSin).length : 0;
+  const res = $('#impResumen');
+  res.classList.toggle('mal', n === 0);
+  res.textContent = n === 0 ? 'No hay fichas con esa selección. Marca “Incluir móviles sin conductor” o cambia la opción.'
+                            : `Se imprimirán ${n} ${n > 1 ? 'hojas' : 'hoja'}, una por ficha.`;
+  $('#impOk').disabled = n === 0;
+  $('#impSinWrap').hidden = modo === 'esta';
+}
+
 /* ---------- Pie ---------- */
 async function pintarPie(){
   const u = await metaGet('ultimoRespaldo');
@@ -884,6 +1036,7 @@ ficha.addEventListener('click', e => {
     case 'guardar': guardar(); break;
     case 'descartar': borrador = clon(registros.find(x => x.movil === actual)); sucio = false; pintarFicha(); aviso('Cambios descartados'); break;
     case 'eliminar': eliminar(); break;
+    case 'imprimir': imprimir([clon(borrador)]); break;
     case 'volver': salirFicha(); break;
     case 'nuevo': dialogoNuevo(); break;
     case 'importar': $('#archivoImportar').click(); break;
@@ -925,6 +1078,7 @@ $('#dlgCamara').addEventListener('close', detenerCamara);
 
 document.addEventListener('keydown', e => {
   if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's' && sucio){ e.preventDefault(); guardar(); }
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p' && registros.length){ e.preventDefault(); abrirImprimir(); }
 });
 
 $('#bNuevo').addEventListener('click', dialogoNuevo);
@@ -940,6 +1094,15 @@ $('#dlgNuevo').addEventListener('close', async () => {
   aviso(`Móvil ${m} creado`);
 });
 
+$('#bImprimir').addEventListener('click', abrirImprimir);
+$('#dlgImprimir').addEventListener('change', actualizarImprimir);
+$('#impCancelar').addEventListener('click', () => $('#dlgImprimir').close());
+$('#impOk').addEventListener('click', () => {
+  const modo = document.querySelector('#dlgImprimir input[name="impModo"]:checked')?.value;
+  const lista = modo ? fichasPara(modo, $('#impSinConductor').checked) : [];
+  $('#dlgImprimir').close();
+  imprimir(lista);
+});
 $('#bImportar').addEventListener('click', () => { const i = $('#archivoImportar'); i.value=''; i.click(); });
 $('#archivoImportar').addEventListener('change', e => { const f = e.target.files[0]; if(f) importar(f); });
 
